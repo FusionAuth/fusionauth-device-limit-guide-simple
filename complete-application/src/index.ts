@@ -104,7 +104,7 @@ app.get('/login', (req, res, next) => {
     res.redirect(302, '/');
   }
 
-  res.redirect(302, `${fusionAuthURL}/oauth2/authorize?client_id=${clientId}&response_type=code&redirect_uri=http://localhost:${port}/oauth-redirect&state=${userSessionCookie?.stateValue}&code_challenge=${userSessionCookie?.challenge}&code_challenge_method=S256`)
+  res.redirect(302, `${fusionAuthURL}/oauth2/authorize?client_id=${clientId}&response_type=code&scope=offline_access&redirect_uri=http://localhost:${port}/oauth-redirect&state=${userSessionCookie?.stateValue}&code_challenge=${userSessionCookie?.challenge}&code_challenge_method=S256`)
 });
 //end::login[]
 
@@ -253,6 +253,8 @@ app.post('/user-login-success', async (req, res, next) => {
     }
   });
   const tokens: any = await tokenResponse.json();
+  // Filter to only refresh tokens for this application.
+  tokens.refreshTokens = tokens.refreshTokens.filter((token: any) => token.applicationId === clientId);
 
   const activeSessionCount = tokens.refreshTokens.length;
   console.log(`User has ${activeSessionCount} of ${maxDeviceCount} allowed active sessions.`);
