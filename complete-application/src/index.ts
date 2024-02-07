@@ -237,7 +237,7 @@ app.get('/oauth2/logout', (req, res, next) => {
 //tag::device-limiting[]
 app.post('/user-login-success', async (req, res, next) => {
 
-  if (req.body.event.applicationId !== clientId) 
+  if (req.body.event.applicationId !== clientId)
     return res.status(200).json(JSON.stringify({ message: `Not a login event for this application.` }));
 
   console.log('A user is attempting to log in. Checking active sessions...');
@@ -245,6 +245,7 @@ app.post('/user-login-success', async (req, res, next) => {
 
   // Make a request to FusionAuth with an API key to get the user's refresh tokens.
   // This is effectively the same as counting the number of active sessions, and therefore devices a user has logged in on.
+  // tag::activeSessionCount[]
   const tokenResponse = await fetch(`${fusionAuthURL}/api/jwt/refresh?userId=${userId}`, {
     method: 'GET',
     headers: {
@@ -255,8 +256,9 @@ app.post('/user-login-success', async (req, res, next) => {
   const tokens: any = await tokenResponse.json();
   // Filter to only refresh tokens for this application.
   tokens.refreshTokens = tokens.refreshTokens.filter((token: any) => token.applicationId === clientId);
-
   const activeSessionCount = tokens.refreshTokens.length;
+  //end::activeSessionCount[]
+
   console.log(`User has ${activeSessionCount} of ${maxDeviceCount} allowed active sessions.`);
   if (activeSessionCount >= maxDeviceCount) {
     console.log('User is not allowed to log in.');
