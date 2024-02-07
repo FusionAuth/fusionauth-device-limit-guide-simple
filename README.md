@@ -1,4 +1,4 @@
-# Example Device Limiting Express.js Application Using Webhooks
+# Example Simple Device Limiting Express.js Application Using Webhooks
 
 This repo holds an example Express.js application that uses FusionAuth as the identity provider. 
 This application will use an OAuth Authorization Code Grant workflow to log a user in and 

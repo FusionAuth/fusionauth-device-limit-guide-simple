@@ -224,12 +224,24 @@ app.get('/logout', (req, res, next) => {
 //end::logout[]
 
 //tag::oauth-logout[]
-app.get('/oauth2/logout', (req, res, next) => {
+app.get('/oauth2/logout', async (req, res, next) => {
   console.log('Logging out...')
+
+  const userTokenCookie = req.cookies[userToken];
+  const refreshTokenId = userTokenCookie?.refresh_token_id;
+  // Revoke the refresh token
+  const result = await fetch(`${fusionAuthURL}/api/jwt/refresh/${refreshTokenId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `${fusionAPIKey}`
+    }
+  });
+
+  // Clear all cookies. 
   res.clearCookie(userSession);
   res.clearCookie(userToken);
   res.clearCookie(userDetails);
-
   res.redirect(302, '/')
 });
 //end::oauth-logout[]
